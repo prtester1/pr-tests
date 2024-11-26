@@ -1,19 +1,15 @@
-name: Check PR Title or Process Comments
+name: kaki
 
 on:
-  pull_request:
-    types: [opened, edited, reopened, synchronize]
   issue_comment:
     types: [created, edited]
 
 jobs:
-  check-pr-or-comment:
+  process-pr-comment:
     runs-on: ubuntu-latest
-    if: >-
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request)
+    if: ${{ github.event.issue.pull_request }} # Ensure it’s a comment on a PR
     steps:
-      - name: Process Pull Request or Comment
+      - name: Echo Comment Body
         env:
           COMMENTBODY: ${{ github.event.comment.body }}
         run: |
