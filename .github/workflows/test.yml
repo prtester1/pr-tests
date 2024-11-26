@@ -12,4 +12,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Get PR Title
-        run: echo "Pull Request Title ${{ github.event.pull_request.title }} "
+        run: echo "Pull Request Title ${{ github.event.pull_request.title }}"
+
+      - name: Process Comment and Set Environment Variables
+        env:
+          COMMENTBODY: ${{ github.event.comment.body }}
+        run: |
+          echo "repo_name=${{ fromJson(steps.request.outputs.data).head.repo.full_name }}" >> $GITHUB_OUTPUT
+          comment_hash=`echo "$COMMENTBODY" | cut -d' ' -f2` # get commit hash if any
+          if [[ "${comment_hash}" == "/runsim" ]]; then 
+            echo "ref=${{ fromJson(steps.request.outputs.data).head.ref }}" >> $GITHUB_OUTPUT # use default head ref
+          else
+            echo "ref=${comment_hash}" >> $GITHUB_OUTPUT # use comment provided ref
+          fi
