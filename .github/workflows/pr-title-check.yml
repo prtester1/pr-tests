@@ -1,0 +1,31 @@
+name: PR Title Check and Echo
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  check-pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get PR Title
+        id: pr-title
+        run: |
+          echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+
+      - name: Check PR Title Length
+        run: |
+          title_length=${#PR_TITLE}
+          if [ $title_length -lt 10 ]; then
+            echo "PR title is too short (minimum 10 characters required)"
+            exit 1
+          fi
+          if [ $title_length -gt 100 ]; then
+            echo "PR title is too long (maximum 100 characters allowed)"
+            exit 1
+          fi
+
+      - name: Echo PR Title
+        run: |
+          echo "PR Title: $PR_TITLE"
+          echo "Title length: ${#PR_TITLE} characters"
